@@ -29,12 +29,12 @@ gobject.threads_init()
 def append_pdf(input,output): 
     [output.addPage(input.getPage(page_num)) for page_num in range(input.numPages)]  
 
-def load_finished_cb(v, frame, op):
-    f = v.get_main_frame()
-    p = gtk.PrintOperation()
-    o = gtk.PRINT_OPERATION_ACTION_EXPORT
-    p.set_export_filename(op)
-    f.print_full(p, o)
+def load_finished_cb(view, frame, output):
+    f = view.get_main_frame()
+    printop = gtk.PrintOperation()
+    opn = gtk.PRINT_OPERATION_ACTION_EXPORT
+    printop.set_export_filename(output)
+    f.print_full(printop, opn)
 
     pdf = PdfFileWriter()
 
@@ -44,7 +44,7 @@ def load_finished_cb(v, frame, op):
     else:
         fobj = None
 
-    ifobj = file(op, 'rb')
+    ifobj = file(output, 'rb')
     append_pdf(PdfFileReader(ifobj), pdf)
 
     filename = str(time.time()) + '.pdf'
@@ -61,24 +61,24 @@ def load_finished_cb(v, frame, op):
 
     gtk.main_quit()
 
-def gen_pdf(file, op):
-    w = gtk.Window()
-    v = webkit.WebView()
-    s = webkit.WebSettings()
-    s.props.default_encoding = 'utf-8'
-    #s.props.enforce_96_dpi = True
-    s.props.default_font_family = 'DejaVu LGC Serif'
-    s.props.enable_plugins = False
-    s.props.enable_scripts = False    
-    v.set_settings(s)
-    v.connect('load-finished', load_finished_cb, op)
-    v.open(file)
+def gen_pdf(file, output):
+    win = gtk.Window()
+    view = webkit.WebView()
+    settings = webkit.WebSettings()
+    settings.props.default_encoding = 'utf-8'
+    settings.props.enforce_96_dpi = True
+    settings.props.default_font_family = 'DejaVu LGC Serif'
+    settings.props.enable_plugins = False
+    settings.props.enable_scripts = False    
+    view.set_settings(settings)
+    view.connect('load-finished', load_finished_cb, output)
+    view.open(file)
 
-    w.add(v)
-    v.set_size_request(1024, 768) #This is to get the image rendering right
+    win.add(view)
+    win.set_size_request(1024, 768) #This is to get the image rendering right
 
-    w.show_all()
-    w.unrealize()
+    win.show_all()
+    win.unrealize()
 
     gtk.main()
 
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     if os.path.exists(sys.argv[2]):
         os.remove(sys.argv[2])
     
-    for i in epub.get_flattoc():
-        filename = os.path.join(epub.get_basedir(), i[1])
-        gen_pdf(filename, os.path.join(tempdir, os.path.basename(i[1])))
+    for item in epub.get_flattoc():
+        filename = os.path.join(epub.get_basedir(), item[1])
+        gen_pdf(filename, os.path.join(tempdir, os.path.basename(item[1])))
     
     shutil.rmtree(tempdir)
