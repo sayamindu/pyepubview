@@ -213,8 +213,9 @@ class _View(gtk.HBox):
         self._view.grab_focus()
         self._view.grab_default()
         self._findjob = job
-        self._view.search_text(self._findjob.get_search_text(), \
-                               self._findjob.get_case_sensitive(), True, False)
+        #self._view.search_text(self._findjob.get_search_text(), \
+        #                       self._findjob.get_case_sensitive(), True, False)
+        self.find_next()
         
     def __set_zoom(self, value):
         self._view.set_zoom_level(value)
