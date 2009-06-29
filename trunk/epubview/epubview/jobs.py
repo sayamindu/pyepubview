@@ -19,6 +19,7 @@
 import gobject
 import gtk
 import webkit
+import cairo
 
 import math
 import os.path
@@ -101,6 +102,15 @@ class _JobPaginator(gobject.GObject):
         self._count = 0
         self._pagecount = 0
         
+        self._screen = gtk.gdk.screen_get_default()
+        self._old_fontoptions = self._screen.get_font_options()
+        options = cairo.FontOptions()
+        options.set_hint_style(cairo.HINT_STYLE_MEDIUM)
+        options.set_antialias(cairo.ANTIALIAS_GRAY)
+        options.set_subpixel_order(cairo.SUBPIXEL_ORDER_DEFAULT)
+        options.set_hint_metrics(cairo.HINT_METRICS_DEFAULT)
+        self._screen.set_font_options(options)
+        
         self._temp_win = gtk.Window()
         self._temp_view = webkit.WebView()
 
@@ -150,6 +160,7 @@ class _JobPaginator(gobject.GObject):
         
         if self._count+1 >= len(self._filelist):
             self._temp_win.destroy()
+            self._screen.set_font_options(self._old_fontoptions)
             self.emit('paginated')
         else:
             self._count += 1
