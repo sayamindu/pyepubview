@@ -26,6 +26,8 @@ import BeautifulSoup
 
 import epub
 
+import threading
+
 PAGE_WIDTH = 135
 PAGE_HEIGHT = 216
 
@@ -36,6 +38,51 @@ def _pixel_to_mm(pixel, dpi):
 def _mm_to_pixel(mm, dpi):
     inches = mm * 0.03937
     return int(inches * dpi)
+
+
+
+class SearchThread(threading.Thread):
+    def __init__(self, obj):
+        threading.Thread.__init__ (self)
+        self.obj = obj
+        self.stopthread = threading.Event()
+
+    def _start_search(self):
+        for entry in self.obj.flattoc:
+            if self.stopthread.isSet():
+                break
+            name, file = entry
+            filepath = os.path.join(self.obj._document.get_basedir(), file)
+            f = open(filepath)
+            if self._searchfile(f):
+                self.obj._matchfilelist.append(file)
+            f.close()
+        
+        gtk.gdk.threads_enter()
+        self.obj._finished = True 
+        self.obj.emit('updated')
+        gtk.gdk.threads_leave()
+        
+        return False
+    
+    def _searchfile(self, fileobj):
+        soup = BeautifulSoup.BeautifulSoup(fileobj)
+        body = soup.find('body')
+        tags = body.findChildren(True)
+        for tag in tags:
+            if not tag.string is None: 
+                if tag.string.find(self.obj._text) > -1:
+                    return True
+    
+        return False
+
+    def run (self):
+        self._start_search()
+      
+    def stop(self):
+        self.stopthread.set()
+
+
 
 class _JobPaginator(gobject.GObject):
     __gsignals__ = {
@@ -136,7 +183,9 @@ class _JobFind(gobject.GObject):
     }
     def __init__(self, document, start_page, n_pages, text, case_sensitive=False):
         gobject.GObject.__init__(self)
+        gtk.threads_init()
         
+        self._finished = False
         self._document = document
         self._start_page = start_page
         self._n_pages = n_pages
@@ -145,10 +194,19 @@ class _JobFind(gobject.GObject):
         self.flattoc = self._document.get_flattoc()
         self._matchfilelist = []
         self._current_file_index = 0
+        self.threads = []
         
-        #self.emit('updated')
-        gobject.idle_add(self._start_search)
+        s_thread = SearchThread(self)
+        self.threads.append(s_thread)
+        s_thread.start()
         
+    def cancel(self):
+        for s_thread in self.threads:
+            s_thread.stop()
+    
+    def is_finished(self):
+        return self._finished
+    
     def get_next_file(self):
         self._current_file_index += 1
         try:
