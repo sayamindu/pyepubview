@@ -179,6 +179,20 @@ class _View(gtk.HBox):
             return False
         self._load_prev_page()
         return True
+
+    def scroll(self, scrolltype, horizontal):
+        if scrolltype == gtk.SCROLL_PAGE_BACKWARD:
+            self.__going_back = True
+            self.__going_fwd = False
+            if not self._do_page_transition():
+                self._view.move_cursor(gtk.MOVEMENT_PAGES, -1)
+        elif scrolltype == gtk.SCROLL_PAGE_FORWARD:
+            self.__going_back = False
+            self.__going_fwd = True
+            if not self._do_page_transition():
+                self._view.move_cursor(gtk.MOVEMENT_PAGES, 1)
+        else:
+            print ('Got unsupported scrolltype %s' % str(scrolltype))
     
     def copy(self):
         self._view.copy_clipboard()
@@ -208,7 +222,7 @@ class _View(gtk.HBox):
             self.__in_search = True
             self.__search_fwd = False
             self._load_file(path)
-            
+
     def _find_changed(self, job):
         self._view.grab_focus()
         self._view.grab_default()
@@ -260,7 +274,7 @@ class _View(gtk.HBox):
             self.__going_fwd = False
 
         self._do_page_transition() 
-        
+    
     def _do_page_transition(self):
         if self.__going_fwd:
             if self._v_vscrollbar.get_value() >= \
