@@ -17,10 +17,11 @@
 
 import gtk, gtk.gdk
 import gobject
-import webkit
+import widgets
 
 import os.path
 import math
+import shutil
 
 from epub import _Epub
 from jobs import _JobPaginator as _Paginator
@@ -69,12 +70,12 @@ class _View(gtk.HBox):
         self.__search_fwd = True
         
         self._sw = gtk.ScrolledWindow()
-        self._view = webkit.WebView()
+        self._view = widgets._WebView()
         self._view.load_string(LOADING_HTML, 'text/html', 'utf-8', '/')
         settings = self._view.get_settings()
         settings.props.default_font_family = 'DejaVu LGC Serif'
         settings.props.enable_plugins = False
-        settings.props.enable_scripts = False
+        #settings.props.enable_scripts = False
         self._view.connect('load-finished', self._view_load_finished_cb)
         self._view.connect('scroll-event', self._view_scroll_event_cb)
         self._view.connect('key-press-event', self._view_keypress_event_cb)
@@ -290,12 +291,20 @@ class _View(gtk.HBox):
         return False
         
     def _view_load_finished_cb(self, v, frame):
-        filename = self._view.props.uri
+        filename = self._view.props.uri.replace('file://', '')
+        if os.path.exists(filename.replace('xhtml', 'xml')):
+            filename = filename.replace('xhtml', 'xml') # Hack for making javascript work
         
         if self._loaded_page < 1 or filename == None:
             return False
         
-        self._loaded_filename = filename.replace('file://', '')
+        self._loaded_filename = filename
+        
+        remfactor = self._paginator.get_remfactor_for_file(filename)
+        pages = self._paginator.get_pagecount_for_file(filename)
+        extra = int(math.ceil(remfactor * self._view.get_page_height()/(pages-remfactor)))
+        if extra > 0:
+            self._view.add_bottom_padding(extra)
         
         if self.__in_search:
             self._view.search_text(self._findjob.get_search_text(), \
@@ -361,8 +370,13 @@ class _View(gtk.HBox):
         self._on_page_changed(pageno)
         filename = self._paginator.get_file_for_pageno(pageno)
         if filename != self._loaded_filename:
-            self._loaded_filename = filename
-            self._view.open(filename)
+            #self._loaded_filename = filename
+            if filename.endswith('xml'):
+                dest = filename.replace('xml', 'xhtml')
+                shutil.copy(filename.replace('file://', ''), dest.replace('file://', ''))
+                self._view.open(dest)
+            else:
+                self._view.open(filename)
         else:
             self._scroll_page()
     

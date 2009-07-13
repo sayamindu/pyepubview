@@ -18,7 +18,7 @@
 
 import gobject
 import gtk
-import webkit
+import widgets
 import cairo
 
 import math
@@ -112,7 +112,7 @@ class _JobPaginator(gobject.GObject):
         self._screen.set_font_options(options)
         
         self._temp_win = gtk.Window()
-        self._temp_view = webkit.WebView()
+        self._temp_view = widgets._WebView()
 
         settings = self._temp_view.get_settings()
         settings.props.default_font_family = 'DejaVu LGC Serif'
@@ -122,7 +122,7 @@ class _JobPaginator(gobject.GObject):
         settings.props.enforce_96_dpi = True
         settings.props.auto_shrink_images = False #FIXME: This does not seem to work
         settings.props.enable_plugins = False
-        settings.props.enable_scripts = False
+        #settings.props.enable_scripts = False
         settings.props.default_font_size = 12
         settings.props.default_monospace_font_size = 10
         
@@ -141,7 +141,7 @@ class _JobPaginator(gobject.GObject):
        
     def _page_load_finished_cb(self, v, frame):
         f = v.get_main_frame()
-        pageheight = f.get_height()
+        pageheight = v.get_page_height()
                 
         if pageheight <= _mm_to_pixel(PAGE_HEIGHT, self._dpi):
             pages = 1
@@ -155,7 +155,7 @@ class _JobPaginator(gobject.GObject):
             self._pagemap[float(self._pagecount + i)] = (f.props.uri, (i-1)/pages, pagelen)
         
         self._pagecount += math.ceil(pages)
-        self._filedict[f.props.uri.replace('file://', '')] = math.ceil(pages)
+        self._filedict[f.props.uri.replace('file://', '')] = (math.ceil(pages), math.ceil(pages) - pages)
         self._bookheight += pageheight
         
         if self._count+1 >= len(self._filelist):
@@ -177,7 +177,10 @@ class _JobPaginator(gobject.GObject):
         return self._pagemap[pageno][2]
     
     def get_pagecount_for_file(self, file):
-        return self._filedict[file]
+        return self._filedict[file][0]
+
+    def get_remfactor_for_file(self, file):
+        return self._filedict[file][1]
     
     def get_total_pagecount(self):
         return self._pagecount
