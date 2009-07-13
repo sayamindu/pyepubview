@@ -23,33 +23,68 @@ class EpubInfo(): #TODO: Cover the entire DC range
         return element.text
     
     def _get_title(self):
-        return self._get_data('{http://purl.org/dc/elements/1.1/}title')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}title')
+        except AttributeError:
+            return None
+        
+        return ret
         
     def _get_creator(self):
-        return self._get_data('{http://purl.org/dc/elements/1.1/}creator')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}creator')
+        except AttributeError:
+            return None        
+        return ret
         
     def _get_date(self):
         #TODO: iter
-        return self._get_data('{http://purl.org/dc/elements/1.1/}date')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}date')
+        except AttributeError:
+            return None
+        
+        return ret
 
     def _get_source(self):
-        return self._get_data('{http://purl.org/dc/elements/1.1/}source')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}source')
+        except AttributeError:
+            return None
+        
+        return ret
 
     def _get_rights(self):
-        return self._get_data('{http://purl.org/dc/elements/1.1/}rights')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}rights')
+        except AttributeError:
+            return None
+        
+        return ret
 
     def _get_identifier(self):
         #TODO: iter
-        element = self._e_metadata.find('{http://purl.org/dc/elements/1.1/}identifier')
-        return {'id':element.get('id'), 'value':element.text}
+        element = self._e_metadata.find('{http://purl.org/dc/elements/1.1/}identifier')            
+
+        if element is not None:
+            return {'id':element.get('id'), 'value':element.text}
+        else:
+            return None
 
     def _get_language(self):
-        return self._get_data('{http://purl.org/dc/elements/1.1/}language')
+        try:
+            ret = self._get_data('{http://purl.org/dc/elements/1.1/}language')
+        except AttributeError:
+            return None
+        
+        return ret
 
     def _get_subject(self):
-        subjectlist = []
-        for element in self._e_metadata.iterfind('{http://purl.org/dc/elements/1.1/}subject'):
-            subjectlist.append(element.text)
-            
-        return subjectlist
+        try:
+            subjectlist = []
+            for element in self._e_metadata.iterfind('{http://purl.org/dc/elements/1.1/}subject'):
+                subjectlist.append(element.text)
+        except AttributeError:
+            return None
         
+        return subjectlist
