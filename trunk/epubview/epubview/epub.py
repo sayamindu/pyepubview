@@ -54,8 +54,10 @@ class _Epub(object):
         orig_cwd = os.getcwd()
         os.chdir(self._tempdir)
         for name in self._zobject.namelist():
+            if name.startswith(os.path.sep): # Some weird zip file entries start with a slash, and we don't want to write to the root directory
+                name = name[1:]
             if name.endswith(os.path.sep) or name.endswith('\\'):
-                os.mkdir(name)
+                os.makedirs(name)
             else:
                 self._zobject.extract(name)
         os.chdir(orig_cwd)
