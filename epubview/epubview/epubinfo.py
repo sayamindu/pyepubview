@@ -24,7 +24,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
     
     def _get_title(self):
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}title')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}title')
         except AttributeError:
             return None
         
@@ -32,7 +32,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
         
     def _get_creator(self):
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}creator')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}creator')
         except AttributeError:
             return None        
         return ret
@@ -40,7 +40,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
     def _get_date(self):
         #TODO: iter
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}date')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}date')
         except AttributeError:
             return None
         
@@ -48,7 +48,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
 
     def _get_source(self):
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}source')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}source')
         except AttributeError:
             return None
         
@@ -56,7 +56,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
 
     def _get_rights(self):
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}rights')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}rights')
         except AttributeError:
             return None
         
@@ -64,7 +64,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
 
     def _get_identifier(self):
         #TODO: iter
-        element = self._e_metadata.find('{http://purl.org/dc/elements/1.1/}identifier')            
+        element = self._e_metadata.find('.//{http://purl.org/dc/elements/1.1/}identifier')            
 
         if element is not None:
             return {'id':element.get('id'), 'value':element.text}
@@ -73,7 +73,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
 
     def _get_language(self):
         try:
-            ret = self._get_data('{http://purl.org/dc/elements/1.1/}language')
+            ret = self._get_data('.//{http://purl.org/dc/elements/1.1/}language')
         except AttributeError:
             return None
         
@@ -82,7 +82,7 @@ class EpubInfo(): #TODO: Cover the entire DC range
     def _get_subject(self):
         try:
             subjectlist = []
-            for element in self._e_metadata.iterfind('{http://purl.org/dc/elements/1.1/}subject'):
+            for element in self._e_metadata.iterfind('.//{http://purl.org/dc/elements/1.1/}subject'):
                 subjectlist.append(element.text)
         except AttributeError:
             return None
