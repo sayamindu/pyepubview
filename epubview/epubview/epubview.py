@@ -320,9 +320,10 @@ class _View(gtk.HBox):
         
         v_upper = self._v_vscrollbar.props.adjustment.props.upper
         v_lower = self._v_vscrollbar.props.adjustment.props.lower
+        v_page_size = self._v_vscrollbar.props.adjustment.props.page_size
         
         scrollfactor = self._paginator.get_scrollfactor_pos_for_pageno(pageno)
-        self._v_vscrollbar.set_value(v_upper * scrollfactor)
+        self._v_vscrollbar.set_value((v_upper - v_page_size)* scrollfactor)
         #self._old_scrollval = v_upper * scrollfactor
         
     def _paginate(self):
@@ -344,14 +345,32 @@ class _View(gtk.HBox):
             return
         scrollval = scrollbar.get_value()
         scroll_upper = self._v_vscrollbar.props.adjustment.props.upper
+        scroll_page_size = self._v_vscrollbar.props.adjustment.props.page_size
 
         if self.__going_fwd == True and not self._loaded_page == self._pagecount:
-            scrollfactor = self._paginator.get_scrollfactor_pos_for_pageno(self._loaded_page + 1)
-            if scrollval != 0 and scrollval >= scroll_upper * scrollfactor:
+            if self._paginator.get_file_for_pageno(self._loaded_page) != \
+                self._paginator.get_file_for_pageno(self._loaded_page + 1):
+                return # We don't need this if the next page is in another file
+
+            scrollfactor_next = self._paginator.get_scrollfactor_pos_for_pageno(self._loaded_page + 1)
+            if scrollval > 0:
+                scrollfactor = scrollval/(scroll_upper - scroll_page_size)
+            else:
+                scrollfactor = 0
+            if scrollfactor >= scrollfactor_next:
                 self._on_page_changed(self._loaded_page + 1)
-        else:
-            scrollfactor = self._paginator.get_scrollfactor_pos_for_pageno(self._loaded_page)
-            if scrollval != 0 and scrollval < scroll_upper * scrollfactor:
+        elif self.__going_back == True and self._loaded_page > 1:
+            if self._paginator.get_file_for_pageno(self._loaded_page) != \
+                        self._paginator.get_file_for_pageno(self._loaded_page - 1):
+                return
+
+            scrollfactor_cur = self._paginator.get_scrollfactor_pos_for_pageno(self._loaded_page)
+            if scrollval > 0:
+                scrollfactor = scrollval/(scroll_upper - scroll_page_size)
+            else:
+                scrollfactor = 0
+
+            if scrollfactor <= scrollfactor_cur:
                 self._on_page_changed(self._loaded_page - 1)
         
     def _on_page_changed(self, pageno):
