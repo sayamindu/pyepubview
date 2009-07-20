@@ -75,7 +75,7 @@ class _View(gtk.HBox):
         settings = self._view.get_settings()
         settings.props.default_font_family = 'DejaVu LGC Serif'
         settings.props.enable_plugins = False
-        #settings.props.enable_scripts = False
+        settings.props.default_encoding = 'utf-8'
         self._view.connect('load-finished', self._view_load_finished_cb)
         self._view.connect('scroll-event', self._view_scroll_event_cb)
         self._view.connect('key-press-event', self._view_keypress_event_cb)
