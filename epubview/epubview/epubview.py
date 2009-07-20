@@ -311,20 +311,26 @@ class _View(gtk.HBox):
                                self._findjob.get_case_sensitive(), \
                                self.__search_fwd, False)
             self.__in_search = False
-        else: 
-            self._scroll_page()
-        
+        else:
+            if self.__going_back:
+                # We need to scroll to the last page
+                self._scroll_page_end()
+            else:
+                self._scroll_page()
+
+    def _scroll_page_end(self):
+        v_upper = self._v_vscrollbar.props.adjustment.props.upper
+        v_page_size = self._v_vscrollbar.props.adjustment.props.page_size
+        self._v_vscrollbar.set_value(v_upper)
         
     def _scroll_page(self):
         pageno = self._loaded_page
         
         v_upper = self._v_vscrollbar.props.adjustment.props.upper
-        v_lower = self._v_vscrollbar.props.adjustment.props.lower
         v_page_size = self._v_vscrollbar.props.adjustment.props.page_size
         
         scrollfactor = self._paginator.get_scrollfactor_pos_for_pageno(pageno)
-        self._v_vscrollbar.set_value((v_upper - v_page_size)* scrollfactor)
-        #self._old_scrollval = v_upper * scrollfactor
+        self._v_vscrollbar.set_value((v_upper - v_page_size) * scrollfactor)
         
     def _paginate(self):
         filelist = []
