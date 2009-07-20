@@ -438,13 +438,14 @@ class _View(gtk.HBox):
             self.__going_back = True
             if not self._do_page_transition():
                 self._view.move_cursor(gtk.MOVEMENT_DISPLAY_LINES, -1)                
-        elif scrolltype == gtk.SCROLL_JUMP:
+        elif scrolltype == gtk.SCROLL_JUMP or \
+            scrolltype == gtk.SCROLL_PAGE_FORWARD or \
+                scrolltype == gtk.SCROLL_PAGE_BACKWARD:
             if value > self._scrollbar.props.adjustment.props.upper:
                 self._load_page(self._pagecount)
             else:
                 self._load_page(round(value))
         else:
-            #self._load_page(round(value))
             print 'Warning: unknown scrolltype %s with value %f' % (str(scrolltype), value)
         
         self._scrollbar.set_value(self._loaded_page) #FIXME: This should not be needed here
