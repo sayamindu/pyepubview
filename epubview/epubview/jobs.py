@@ -240,31 +240,7 @@ class _JobFind(gobject.GObject):
             path = self._matchfilelist[self._current_file_index]
    
         return path
-    
-    def _start_search(self):
-        for entry in self.flattoc:
-            name, file = entry
-            filepath = os.path.join(self._document.get_basedir(), file)
-            f = open(filepath)
-            if self._searchfile(f):
-                self._matchfilelist.append(file)
-            f.close()
-        
-        self.emit('updated')
-        
-        return False
-    
-    def _searchfile(self, fileobj):
-        soup = BeautifulSoup.BeautifulSoup(fileobj)
-        body = soup.find('body')
-        tags = body.findChildren(True)
-        for tag in tags:
-            if not tag.string is None: 
-                if tag.string.find(self._text) > -1:
-                    return True
-    
-        return False
-    
+
     def get_search_text(self):
         return self._text
     
