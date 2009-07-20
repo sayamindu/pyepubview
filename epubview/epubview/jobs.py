@@ -120,11 +120,11 @@ class _JobPaginator(gobject.GObject):
         settings.props.serif_font_family = 'DejaVu LGC Serif'
         settings.props.monospace_font_family = 'DejaVu LGC Sans Mono'
         settings.props.enforce_96_dpi = True
-        settings.props.auto_shrink_images = False #FIXME: This does not seem to work
+        #settings.props.auto_shrink_images = False #FIXME: This does not seem to work
         settings.props.enable_plugins = False
-        #settings.props.enable_scripts = False
         settings.props.default_font_size = 12
         settings.props.default_monospace_font_size = 10
+        settings.props.default_encoding = 'utf-8'
         
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
