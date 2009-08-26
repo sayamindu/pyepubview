@@ -13,6 +13,8 @@ class _WebView(webkit.WebView):
         ret = self.get_main_frame().get_title()
         js = 'document.title=oldtitle;'
         self.execute_script(js)
+        if ret is None:
+            return 0
         return int(ret)
         
     def add_bottom_padding(self, incr):
