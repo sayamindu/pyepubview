@@ -52,8 +52,7 @@ class SearchThread(threading.Thread):
         for entry in self.obj.flattoc:
             if self.stopthread.isSet():
                 break
-            name, file = entry
-            filepath = os.path.join(self.obj._document.get_basedir(), file)
+            filepath = os.path.join(self.obj._document.get_basedir(), entry)
             f = open(filepath)
             if self._searchfile(f):
                 self.obj._matchfilelist.append(file)

@@ -335,7 +335,7 @@ class _View(gtk.HBox):
     def _paginate(self):
         filelist = []
         for i in self._epub._navmap.get_flattoc():
-            filelist.append(os.path.join(self._epub._tempdir, i[1]))
+            filelist.append(os.path.join(self._epub._tempdir, i))
             
         self._paginator = _Paginator(filelist)
         self._paginator.connect('paginated', self._paginated_cb)
