@@ -28,7 +28,7 @@ class _Epub(object):
     def __init__(self, filepath):
         self._filepath = filepath
         self._zobject = None
-        self._obfpath = None
+        self._opfpath = None
         self._ncxpath = None
         self._basepath = None
         self._tempdir = tempfile.mkdtemp()
@@ -36,15 +36,15 @@ class _Epub(object):
         if not self._verify():
             print 'Warning: This does not seem to be a valid epub file'
         
-        self._get_obf()
+        self._get_opf()
         self._get_ncx()
         
         ncxfile = self._zobject.open(self._ncxpath)
-        obffile = self._zobject.open(self._obfpath)        
-        self._navmap = navmap.NavMap(obffile, ncxfile, self._basepath)
+        opffile = self._zobject.open(self._opfpath)        
+        self._navmap = navmap.NavMap(opffile, ncxfile, self._basepath)
         
-        obffile = self._zobject.open(self._obfpath)
-        self._info = epubinfo.EpubInfo(obffile) 
+        opffile = self._zobject.open(self._opfpath)
+        self._info = epubinfo.EpubInfo(opffile) 
         
         self._unzip()
         
@@ -62,7 +62,7 @@ class _Epub(object):
         os.chdir(orig_cwd)
 
                 
-    def _get_obf(self):
+    def _get_opf(self):
         containerfile = self._zobject.open('META-INF/container.xml')
         
         tree = etree.parse(containerfile)
@@ -70,10 +70,10 @@ class _Epub(object):
         
         for element in root.iterfind('.//{urn:oasis:names:tc:opendocument:xmlns:container}rootfile'):
             if element.get('media-type') == 'application/oebps-package+xml':
-                self._obfpath = element.get('full-path')
+                self._opfpath = element.get('full-path')
         
-        if self._obfpath.rpartition('/')[0]:        
-            self._basepath = self._obfpath.rpartition('/')[0] + '/'
+        if self._opfpath.rpartition('/')[0]:        
+            self._basepath = self._opfpath.rpartition('/')[0] + '/'
         else:
             self._basepath = ''
             
@@ -81,9 +81,9 @@ class _Epub(object):
 
 
     def _get_ncx(self):
-        obffile = self._zobject.open(self._obfpath)
+        opffile = self._zobject.open(self._opfpath)
         
-        tree = etree.parse(obffile)
+        tree = etree.parse(opffile)
         root = tree.getroot()
 
         for element in root.iterfind('.//{http://www.idpf.org/2007/opf}item'):
@@ -91,8 +91,8 @@ class _Epub(object):
                 element.get('id') == 'ncx':
                 self._ncxpath = self._basepath + element.get('href')
         
-        obffile.close()
-                                        
+        opffile.close()
+
     def _verify(self):
         '''
         Method to crudely check to verify that what we 
@@ -109,7 +109,7 @@ class _Epub(object):
         mtypefile = self._zobject.open('mimetype')
         mimetype = mtypefile.readline()
         
-        if mimetype != 'application/epub+zip':
+        if not mimetype.startswith('application/epub+zip'): # Some files seem to have trailing characters
             return False
         
         return True
