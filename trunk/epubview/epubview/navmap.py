@@ -77,9 +77,17 @@ class NavMap(object):
             return
              
     def get_gtktreestore(self):
+        '''
+        Returns a GtkTreeModel representation of the
+        Epub table of contents
+        '''        
         return self._gtktreestore
     
     def get_flattoc(self):
+        '''
+        Returns a flat (linear) list of files to be
+        rendered.
+        '''       
         return self._flattoc
     
 #t = TocParser('/home/sayamindu/Desktop/Test/OPS/fb.ncx')
