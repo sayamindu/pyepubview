@@ -115,17 +115,36 @@ class _Epub(object):
         return True
     
     def get_toc_model(self):
+        '''
+        Returns a GtkTreeModel representation of the
+        Epub table of contents
+        '''        
         return self._navmap.get_gtktreestore()
     
     def get_flattoc(self):
+        '''
+        Returns a flat (linear) list of files to be
+        rendered.
+        '''                
         return self._navmap.get_flattoc()
     
     def get_basedir(self):
+        '''
+        Returns the base directory where the contents of the
+        epub has been unzipped
+        '''
         return self._tempdir
     
     def get_info(self):
+        '''
+        Returns a EpubInfo object for the open Epub file
+        '''        
         return self._info
     
     def close(self):
+        '''
+        Cleans up (closes open zip files and deletes uncompressed content of Epub. 
+        Please call this when a file is being closed or during application exit. 
+        '''                
         self._zobject.close()
         shutil.rmtree(self._tempdir)
