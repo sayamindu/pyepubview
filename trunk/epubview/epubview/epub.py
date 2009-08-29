@@ -86,9 +86,11 @@ class _Epub(object):
         tree = etree.parse(opffile)
         root = tree.getroot()
 
+        spine = root.find('.//{http://www.idpf.org/2007/opf}spine')
+        tocid = spine.get('toc')
+
         for element in root.iterfind('.//{http://www.idpf.org/2007/opf}item'):
-            if element.get('media-type') == 'application/x-dtbncx+xml' or \
-                element.get('id') == 'ncx':
+            if element.get('id') == tocid:
                 self._ncxpath = self._basepath + element.get('href')
         
         opffile.close()
