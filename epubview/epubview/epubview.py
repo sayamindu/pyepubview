@@ -351,8 +351,8 @@ class _View(gtk.HBox):
     def _view_load_finished_cb(self, v, frame):
     	
         # Normally the line below would not be required - ugly workaround for 
-    	# possible Webkit bug. See : https://bugs.launchpad.net/bugs/483231
-    	self._sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_NEVER)
+        # possible Webkit bug. See : https://bugs.launchpad.net/bugs/483231
+        self._sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_NEVER)
         
         filename = self._view.props.uri.replace('file://', '')
         if os.path.exists(filename.replace('xhtml', 'xml')):
