@@ -1,0 +1,1 @@
+PyEpubView is a PyGTK and PyWebkitGTK based widget for viewing Epub files. Though designed primarily for the Read Activity in Sugar (used in the OLPC XO-1 laptops), the widget is designed so that it can be used in any other Python applications as well. A simple Epubviewer is included in the sourcecode, along with a Epub to PDF converter.
